@@ -3,6 +3,7 @@ import {
   addPayment,
   updateCategoryFees,
   getPaymentsByCondition,
+  deleteFeeStructure,
 } from "../controllers/feesController.mjs";
 import isAuth from "../middlewares/isAuthenticated.mjs";
 import isAdmin from "../middlewares/isAdmin.mjs";
@@ -81,6 +82,16 @@ router.get("/students/:id/payments", isAuth, async (req, res) => {
     res.status(200).json({ success: true, payments });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete("/fees/:id", isAuth, isAdmin, async (req, res) => {
+  try {
+    const feeStructureId = req.params.id;
+    const result = await deleteFeeStructure(feeStructureId);
+    res.status(200).json(result);
+  } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });

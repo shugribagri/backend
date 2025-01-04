@@ -80,4 +80,36 @@ async function getPaymentsByCondition(condition = {}) {
   });
 }
 
-export { addPayment, updateCategoryFees, getPaymentsByCondition };
+async function deleteFeeStructure(feeStructureId) {
+  // Fetch the fee structure
+  const feeStructure = await FeeStructure.findByPk(feeStructureId);
+
+  if (!feeStructure) {
+    throw new Error("Fee structure not found");
+  }
+
+  // Fetch all students in the specified category
+  const students = await User.findAll({
+    where: { feeCategory: feeStructure.feeCategory },
+  });
+
+  // Update fee balance for each student
+  await Promise.all(
+    students.map(async (student) => {
+      student.feeBalance -= parseFloat(feeStructure.amount); // Deduct term fee from balance
+      await student.save();
+    })
+  );
+
+  // Delete the fee structure
+  await feeStructure.destroy();
+
+  return { success: true, message: "Fee structure deleted successfully" };
+}
+
+export {
+  addPayment,
+  updateCategoryFees,
+  getPaymentsByCondition,
+  deleteFeeStructure,
+};
