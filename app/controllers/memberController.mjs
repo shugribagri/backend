@@ -33,7 +33,8 @@ async function createMember(req, res) {
 
 async function editUserAndMember(req, res) {
   try {
-    const { userId, name, email, dateOfBirth, feeCategory } = req.body;
+    const { userId, name, email, dateOfBirth, feeCategory, feeBalance } =
+      req.body;
 
     if (!userId) {
       return res.status(400).json({ error: "User ID is required" });
@@ -46,11 +47,12 @@ async function editUserAndMember(req, res) {
 
     const member = await Member.findOne({ where: { userId } });
 
-    if (name || email || feeCategory) {
+    if (name || email || feeCategory || feeBalance) {
       await user.update({
         ...(name && { name }),
         ...(email && { email }),
         ...(feeCategory && { feeCategory }),
+        ...(feeBalance && { feeBalance }),
       });
     }
 
